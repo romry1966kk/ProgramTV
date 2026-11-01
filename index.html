@@ -36,8 +36,11 @@ h3{margin:14px 0 6px}
 #s textarea{background:#fff;color:#000;border:1px solid #888;border-radius:4px}
 .h{cursor:grab;padding:0 4px;opacity:.7}.lab[draggable]{cursor:grab}.ov{outline:2px solid #bf4}
 a{color:#8cf}
-#s input[type=file]{display:block;width:100%;max-width:100%;margin-top:8px;font-size:16px}
-#s input[type=file]::file-selector-button{font-size:16px;min-height:46px;padding:8px 16px;margin-right:12px;border:0;border-radius:6px;background:#1d4a7c;color:#fff}
+#s input[type=file]{display:block;width:100%;max-width:100%;margin-top:8px}
+#s input[type=file]::file-selector-button{font:inherit;padding:6px 10px;margin-right:10px;border:0;border-radius:6px;background:#1d4a7c;color:#fff;cursor:pointer}
+.bx{background:#0a223c;border-radius:8px;padding:4px 12px 8px;margin-bottom:14px}
+.bx h3{margin-top:8px}
+.ver{text-align:center;margin:4px 0 12px}
 </style></head><body>
 <header>
 <button id="bn">Teraz</button><button id="br">Odśwież</button><button id="bs">Ustawienia</button>
@@ -45,19 +48,26 @@ a{color:#8cf}
 </header>
 <div id="g"></div>
 <div id="s" hidden>
-<button id="sc">Zamknij</button>
+<p class="ver">Program TV v1 © 2026 romry</p>
+<div class="bx">
 <h3>Źródło danych</h3>
 <p>Adres pliku XMLTV: <input type="text" id="url" style="width:100%"><br>
 <button id="rf">Pobierz teraz</button> <label><input type="checkbox" id="au"> pobieraj automatycznie przy otwarciu (tylko jeśli serwer na to pozwala)</label></p>
 <p>Albo plik zapisany na dysku (.xml lub .xml.gz): <input type="file" id="fx" accept=".xml,.gz"></p>
 <p id="sm" style="color:#bf4;min-height:1.4em"></p>
 <datalist id="dl2"></datalist>
+</div>
+<div class="bx">
 <h3>Kopia zapasowa</h3>
 <p><button id="ex">Zapisz do pliku</button> Wczytaj: <input type="file" id="fj" accept=".json"> <button id="rs">Reset</button></p>
+</div>
+<p><button id="sc">Zamknij</button></p>
+<div class="bx">
 <h3>Kanały (kolejność i widoczność)</h3>
 <p><input type="search" id="q" placeholder="szukaj…"> <label><input type="checkbox" id="ov"> tylko widoczne</label> <label><input type="checkbox" id="nx"> tylko bez programu</label> <button id="so">Sortuj wg numerów</button></p>
 <p style="font-size:13px;opacity:.8">⚠ brak programu · ≈ dopasowano przybliżenie (sprawdź)</p>
 <div id="ls"></div>
+</div>
 </div>
 <script>
 const RAW="1 TVP 1;2 TVP 2;4 TV4;5 Polsat;7 TVN;8 TV Puls;9 TVN 7;81 Polsat Sport Premium 1;82 Polsat Sport Premium 2;83 Polsat Sport Extra 1;84 Polsat Sport Extra 2;85 Polsat Sport Extra 3;86 Polsat Sport Extra 4;101 TVP HD;106 TVN Style;108 TVN Turbo;109 BBC Lifestyle;110 BBC First;111 BBC Brit;112 ID;113 Viasat True Crime;114 TLC;115 Polsat Cafe;116 Crime+Investigation Polsat;118 Super Polsat;119 Tele5;120 Fashion TV;121 E! Entertainment;122 Stargaze TV;146 CANAL+ Domo;148 CANAL+ Kuchnia;149 Food Network;150 Polsat 2;151 PULS 2;152 ESKA TV;153 Nowa TV;154 TVP Rozrywka;155 TV6;156 ZOOM;157 METRO;158 WP;159 Home TV;161 Polsat Rodzina;162 Show TV;163 Active Family;164 ULTRA TV;165 TVP Kobieta;166 News24;167 Antena;168 Novelas+;169 CTV - Dla Ciebie;252 FunBox (4K);253 WPolsce24;254 ULTRA TV (4K);319 TVP Info;320 TVP 3;322 Polsat News;323 BIZNES24 HD;333 TVN 24;334 Polsat News 2;335 TVN 24 BiS;336 TTV;338 HGTV;339 WPolsce24;340 TV Republika;341 Wydarzenia 24;342 Euronews;343 BBC News;344 Polsat News Polityka;345 Euronews Polski;346 Bloomberg;347 CNN;352 TVS;353 TVP Polonia;355 TVC;357 TVC Super;370 National Geographic;371 HISTORY;372 National Geographic Wild;373 Nat Geo People;374 H2;375 TVP Nauka;376 Discovery Channel;377 Discovery Science;378 DTX;379 Polsat Viasat Explore;380 Discovery Life;381 Animal Planet;382 BBC Earth;383 Travel Channel;384 PLANETE+;385 Adventure;386 Fokus TV;387 TVP Kultura;388 TVP Historia;390 Polsat Viasat History;391 Discovery Historia;392 Polsat Reality;393 TVP Dokument;395 Polsat Viasat Nature;396 Polsat Doku;397 DocuBox;399 STUDIOMED TV;400 Polsat X;422 Inultra;440 HBO;441 HBO 2;442 HBO 3;443 CINEMAX;444 CINEMAX 2;447 CANAL+ PREMIUM;448 CANAL+ 1;449 CANAL+ FILM;450 CANAL+ SERIALE;451 CANAL+ 360;452 CANAL+ DOKUMENT;453 CANAL+ SPORT;454 CANAL+ SPORT 2;455 CANAL+ SPORT 3;456 CANAL+ SPORT 4;458 CANAL+ NOW;465 SkyShowtime 1;466 SkyShowtime 2;468 FILMBOX+ One;469 FILMBOX+ Emotion;470 FILMBOX+ Hits;471 FILMBOX+ Comedy;472 FILMBOX+ Action;473 FILMBOX+ Festival;474 Kino Polska;475 AXN;476 Kabaret TV;477 AXN Spin;479 AXN White;480 AXN Black;481 Polsat Film;482 ale kino+;483 Paramount Network;484 Comedy Central;485 Polsat Comedy Central Extra;486 Warner TV;487 FX;488 AMC;489 FX Comedy;490 Bollywood;491 Filmmax (4K);492 TVP Seriale;493 Romance TV;494 Sundance TV;495 Novela TV;496 TVN Fabuła;497 Stopklatka;498 Polsat Seriale;499 Viasat Epic Drama;500 13 ulica;501 Sci Fi;502 Polsat Film 2;503 ViDoc TV;521 Nautical Channel HD;552 TVP Sport;553 CANAL+ SPORT 5;554 Eleven Sports 1 HD;555 Eleven Sports 2 HD;556 Eleven Sports 3 HD;557 Polsat Sport 1;558 Polsat Sport 2;559 Polsat Sport Fight;561 Polsat Sport 3;562 Polsat Play;563 Polsat Games;564 Eurosport 1;565 Eurosport 2;566 Eurosport 3;567 Eurosport 4;568 SportKlub;569 Fightklub;570 FightBox;571 Extreme Channel;572 Motowizja;573 Golf Zone;574 Gametoon;662 TVP ABC;663 Polsat JimJam;665 Cbeebies;666 MiniMini+;667 Nick Jr.;668 Nickelodeon;669 Nicktoons;670 Cartoon Network;671 Disney Channel;672 Disney XD;673 Disney Junior;674 Da Vinci;675 Cartoonito;676 teleTOON+;677 TOP KIDS;678 Junior Music;679 Junior Channel;681 TeenNick;682 TVP Alfa;770 4FUN.TV;771 4FUN KIDS;772 4FUN DANCE;773 STARS.TV;774 VOX Music TV;775 Music Box Polska;777 MTV Polska;783 Szlagier TV;784 Nuta.TV;785 ESKA TV EXTRA;786 Polsat Music;787 Disco Polo Music;788 Polo TV;789 Power TV;790 Kino Polska Muzyka;795 Mezzo;796 Mezzo Live;797 Mixtape;798 Nuta Gold;806 Bielsat;807 Current Time;808 TVP World;809 TBN Polska;811 Sky News;814 Deutsche Welle;818 France24;852 TV Trwam;854 Polonia";
