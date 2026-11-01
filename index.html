@@ -36,6 +36,20 @@ h3{margin:14px 0 6px}
 #s textarea{background:#fff;color:#000;border:1px solid #888;border-radius:4px}
 .h{cursor:grab;padding:0 4px;opacity:.7}.lab[draggable]{cursor:grab}.ov{outline:2px solid #bf4}
 a{color:#8cf}
+#sc{position:sticky;top:0;z-index:2}
+@media (pointer:coarse),(max-width:700px){
+ button{min-height:46px;min-width:46px;font-size:16px;padding:8px 14px}
+ header{gap:8px;padding:8px}
+ header label,#s label{font-size:16px;padding:6px 0}
+ input[type=checkbox]{width:28px;height:28px;vertical-align:middle;margin:0 6px 0 0}
+ #s input[type=text],#s input[type=search],#s textarea,#s select{font-size:16px;min-height:46px;padding:8px}
+ #s input[type=file]{font-size:16px;max-width:100%;padding:8px 0}
+ .li{gap:8px;padding:8px 0;flex-wrap:wrap}
+ .li label{flex:1 1 calc(100% - 110px);white-space:normal}
+ .li .x{flex:1 1 140px;width:auto;min-width:0}
+ .h{font-size:24px;padding:8px 10px}
+ #s p{line-height:1.5}
+}
 </style></head><body>
 <header>
 <button id="bn">Teraz</button><button id="br">Odśwież</button><button id="bs">Ustawienia</button>
@@ -45,12 +59,9 @@ a{color:#8cf}
 <div id="s" hidden>
 <button id="sc">Zamknij</button>
 <h3>Źródło danych</h3>
-<p>Serwis: <select id="src"></select> <button id="rf">Pobierz teraz</button></p>
-<p>Własny adres XMLTV: <input type="text" id="url" style="width:100%"></p>
-<p>Proxy CORS (opcjonalnie, np. <code>https://adres-proxy/?{url}</code>): <input type="text" id="px" style="width:100%"></p>
-<p>Jeśli pobieranie jest blokowane: otwórz serwis i zapisz plik: <span id="dl"></span><br>
-potem wczytaj go tutaj (.xml lub .xml.gz): <input type="file" id="fx" accept=".xml,.gz"></p>
-<p>Albo wklej cały tekst ze strony z programem (na tej stronie Ctrl+A, Ctrl+C, tu Ctrl+V):<br><textarea id="pt" rows="3" style="width:100%"></textarea><br><button id="pb">Wczytaj wklejony tekst</button></p>
+<p>Adres pliku XMLTV: <input type="text" id="url" style="width:100%"><br>
+<button id="rf">Pobierz teraz</button> <label><input type="checkbox" id="au"> pobieraj automatycznie przy otwarciu (tylko jeśli serwer na to pozwala)</label></p>
+<p>Albo plik zapisany na dysku (.xml lub .xml.gz): <input type="file" id="fx" accept=".xml,.gz"></p>
 <p id="sm" style="color:#bf4;min-height:1.4em"></p>
 <datalist id="dl2"></datalist>
 <h3>Kopia zapasowa</h3>
@@ -86,7 +97,6 @@ const hm=t=>new Date(t).toLocaleTimeString('pl',{hour:'2-digit',minute:'2-digit'
 function ptime(s){const m=s.match(/(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)\s*([+-]\d{4})?/);if(!m)return 0;
  const o=m[7]?(m[7][0]=='-'?-1:1)*(+m[7].slice(1,3)*60+ +m[7].slice(3)):0;
  return Date.UTC(m[1],m[2]-1,m[3],m[4],m[5],m[6])-o*60000}
-const SRC=[['epgshare01 (GitHub)','https://raw.githubusercontent.com/epgshare01/share01/master/epg_ripper_PL1.xml.gz'],['epgshare01 (serwer)','https://epgshare01.online/epgshare01/epg_ripper_PL1.xml.gz'],['epg-polska.net','https://epg-polska.net/guide.xml']];
 const X=n=>S.xid[n]||S.au[n]||'';
 const NO=n=>!(D.p[X(n)]&&D.p[X(n)].length);
 async function dec(buf){const u=new Uint8Array(buf);
@@ -129,13 +139,12 @@ async function ingest(text){
  idb('put',D).then(ok=>{if(ok)localStorage.removeItem('tv.d');else if(!sv('tv.d',D))msg('UWAGA: nie zapisano danych w pamięci przeglądarki (plik za duży). Zrób kopię zapasową.')});
  const vis=CH.filter(c=>S.vis[c.n]),ok=vis.filter(c=>p[X(c.n)]),all=CH.filter(c=>p[X(c.n)]);
  msg(`${info()} · z programem: ${ok.length}/${vis.length} widocznych, ${all.length}/${CH.length} wszystkich`);draw();list()}
-async function refresh(){
- S.url=cu(S.url);const u=S.src=='c'?[S.url]:S.src=='a'?[S.url].concat(SRC.map(s=>s[1])):[SRC[+S.src][1]],er=[];
- for(const a of u){if(!a)continue;msg('Pobieranie: '+a.split('/')[2]+'…');
-  try{const r=await fetch(S.proxy?S.proxy.replace('{url}',encodeURIComponent(a)):a);if(!r.ok)throw Error('HTTP '+r.status);
-   await ingest(await dec(await r.arrayBuffer()));return}
-  catch(e){er.push(a.split('/')[2]+': '+(/fetch|Load failed|NetworkError/i.test(e.message)?'zablokowane (CORS) lub brak sieci':e.message))}}
- msg('Nie pobrano. '+er.join('; ')+'. Pobierz plik ręcznie i wczytaj go w Ustawieniach.')}
+async function refresh(q){
+ S.url=cu(S.url);if(!S.url){if(q!==1)msg('Wpisz adres XMLTV albo wybierz plik z dysku');return}
+ msg('Pobieranie: '+S.url.split('/')[2]+'…');
+ try{const r=await fetch(S.url);if(!r.ok)throw Error('HTTP '+r.status);await ingest(await dec(await r.arrayBuffer()))}
+ catch(e){if(q===1){msg(info());return}
+  msg('Nie pobrano ('+(/fetch|Load failed|NetworkError/i.test(e.message)?'serwer nie zezwala przeglądarce na pobranie (CORS) lub brak sieci':e.message)+'). Zapisz plik na dysk i wybierz go poniżej.')}}
 let R=null,tkf=0;
 function draw(){
  const g=$('#g'),keep=g.scrollLeft,kt=g.scrollTop,cw=g.clientWidth||1000,now=Date.now(),t0=Math.floor((now-36e5)/18e5)*18e5,t1=Math.ceil(Math.max(t0+12*36e5,Math.min(D.mx||0,t0+8*864e5))/18e5)*18e5,k=S.ppm/6e4,L=150,W=(t1-t0)*k;
@@ -176,14 +185,12 @@ $('#ls').addEventListener('change',e=>{const a=e.target.dataset.a,n=+e.target.cl
 $('#q').oninput=$('#ov').onchange=$('#nx').onchange=list;
 $('#all').checked=!!S.all;$('#all').onchange=e=>{S.all=e.target.checked;save();draw()};
 $('#so').onclick=()=>{S.order.sort((a,b)=>a-b);save();list();draw()};
-$('#bn').onclick=toNow;$('#br').onclick=refresh;$('#rf').onclick=()=>{S.src=$('#src').value;S.url=cu($('#url').value);$('#url').value=S.url;if(S.src=='c'&&!S.url){msg('Wpisz adres XMLTV we własnym adresie');return}S.proxy=$('#px').value.trim();save();refresh()};
-$('#bs').onclick=()=>{$('#src').innerHTML='<option value="a">Automatycznie (po kolei)</option>'+SRC.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join('')+'<option value="c">Własny adres</option>';
- $('#src').value=S.src;$('#url').value=S.url;$('#px').value=S.proxy;
- $('#dl').innerHTML=SRC.map(x=>`<a href="${x[1]}" target="_blank" rel="noopener">${x[0]}</a>`).join(' · ');list();$('#s').hidden=false};
+$('#bn').onclick=toNow;$('#br').onclick=()=>refresh();
+$('#rf').onclick=()=>{S.url=cu($('#url').value);$('#url').value=S.url;S.auto=$('#au').checked;save();refresh()};
+$('#bs').onclick=()=>{$('#url').value=S.url;$('#au').checked=!!S.auto;list();$('#s').hidden=false};
 $('#sc').onclick=()=>{$('#s').hidden=true};
 $('#bm').onclick=()=>{S.ppm=Math.max(2,S.ppm-1);save();draw()};
 $('#bp').onclick=()=>{S.ppm=Math.min(12,S.ppm+1);save();draw()};
-$('#pb').onclick=()=>{const t=$('#pt').value;if(!t.trim()){msg('Pole jest puste');return}msg('Przetwarzanie…');setTimeout(async()=>{try{await ingest(t);$('#pt').value=''}catch(x){msg('Błąd: '+x.message)}},30)};
 $('#fx').onchange=async e=>{const f=e.target.files[0];if(!f)return;msg('Czytanie pliku…');
  try{await ingest(await dec(await f.arrayBuffer()))}catch(x){msg('Błąd pliku: '+x.message)}};
 $('#fj').onchange=async e=>{const f=e.target.files[0];if(!f)return;
@@ -203,6 +210,6 @@ let dn=null;const clr=()=>document.querySelectorAll('.ov').forEach(x=>x.classLis
 draw();toNow();
 msg(info());
 idb('get').then(d=>{if(d&&d.v==2&&d.t>=(D.t||0)){D=d;draw();list();msg(info())}});
-if(navigator.onLine&&Date.now()-D.t>6*36e5)refresh();
+if(S.auto&&S.url&&navigator.onLine&&Date.now()-D.t>6*36e5)refresh(1);
 setInterval(()=>{if(!document.hidden)draw()},18e4);
 </script></body></html>
