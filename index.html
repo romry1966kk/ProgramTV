@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Program TV</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:15px system-ui,sans-serif;background:#0d2a4a;color:#fff;height:100vh;display:flex;flex-direction:column}
+header{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:6px 8px;background:#0a1f38}
+button,input{font:inherit}
+button{background:#1d4a7c;color:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
+button:hover{background:#2b66a8}
+#st{font-size:12px;opacity:.8;margin-left:auto}
+#g{flex:1;overflow:auto;position:relative}
+.in{position:relative}
+.row{position:relative;height:56px;border-bottom:1px solid #2b5a8c}
+.hd{position:sticky;top:0;z-index:5;height:28px;background:#0a1f38}
+.lab{position:sticky;left:0;z-index:4;width:150px;height:100%;background:#12385f;padding:4px 8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:48px;border-right:1px solid #2b5a8c}
+.hd .lab{background:#0a1f38}
+.lab b{color:#5ad;margin-right:6px}
+.tk{position:absolute;top:4px;font-size:13px;padding-left:4px;border-left:1px solid #2b5a8c}
+.p{position:absolute;top:2px;height:52px;background:#1a4676;border-radius:4px;padding:4px 6px;overflow:hidden;overflow:clip;white-space:nowrap;line-height:21px;border:1px solid #0d2a4a}
+.p.now{background:#b8bec6;color:#10151b}
+.t{position:sticky;left:158px;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
+.t .n{display:block;overflow:hidden;text-overflow:ellipsis}
+.t small{display:block;font-size:12px;line-height:17px;opacity:.75;overflow:hidden;text-overflow:ellipsis}
+.nd{position:absolute;top:0;bottom:0;width:2px;background:#bf4;z-index:3;pointer-events:none}
+.none{position:absolute;left:160px;top:0;line-height:56px;opacity:.5}
+#s{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:#0d2a4a;opacity:1;z-index:1000;overflow:auto;padding:12px max(12px,calc(50% - 380px))}
+.lab.off{background:#0e2f50;color:#8da4bd}.lab.off b{color:#4f7fa8}
+#s[hidden]{display:none}
+#s input[type=text],#s input[type=search]{background:#fff;color:#000;border:1px solid #888;border-radius:4px;padding:5px;max-width:100%}
+.li{display:flex;gap:6px;align-items:center;padding:3px 0;border-bottom:1px solid #2b5a8c}
+.li label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .x{width:130px}
+h3{margin:14px 0 6px}
+#s textarea{background:#fff;color:#000;border:1px solid #888;border-radius:4px}
+.h{cursor:grab;padding:0 4px;opacity:.7}.lab[draggable]{cursor:grab}.ov{outline:2px solid #bf4}
+a{color:#8cf}
+</style></head><body>
+<header>
+<button id="bn">Teraz</button><button id="br">Odśwież</button><button id="bs">Ustawienia</button>
+<button id="bm">−</button><button id="bp">+</button><label><input type="checkbox" id="all"> Pokaż wszystkie</label><span id="st"></span>
+</header>
+<div id="g"></div>
+<div id="s" hidden>
+<button id="sc">Zamknij</button>
+<h3>Źródło danych</h3>
+<p>Serwis: <select id="src"></select> <button id="rf">Pobierz teraz</button></p>
+<p>Własny adres XMLTV: <input type="text" id="url" style="width:100%"></p>
+<p>Proxy CORS (opcjonalnie, np. <code>https://adres-proxy/?{url}</code>): <input type="text" id="px" style="width:100%"></p>
+<p>Jeśli pobieranie jest blokowane: otwórz serwis i zapisz plik: <span id="dl"></span><br>
+potem wczytaj go tutaj (.xml lub .xml.gz): <input type="file" id="fx" accept=".xml,.gz"></p>
+<p>Albo wklej cały tekst ze strony z programem (na tej stronie Ctrl+A, Ctrl+C, tu Ctrl+V):<br><textarea id="pt" rows="3" style="width:100%"></textarea><br><button id="pb">Wczytaj wklejony tekst</button></p>
+<p id="sm" style="color:#bf4;min-height:1.4em"></p>
+<datalist id="dl2"></datalist>
+<h3>Kopia zapasowa</h3>
+<p><button id="ex">Zapisz do pliku</button> Wczytaj: <input type="file" id="fj" accept=".json"> <button id="rs">Reset</button></p>
+<h3>Kanały (kolejność i widoczność)</h3>
+<p><input type="search" id="q" placeholder="szukaj…"> <label><input type="checkbox" id="ov"> tylko widoczne</label> <label><input type="checkbox" id="nx"> tylko bez programu</label> <button id="so">Sortuj wg numerów</button></p>
+<p style="font-size:13px;opacity:.8">⚠ brak programu · ≈ dopasowano przybliżenie (sprawdź)</p>
+<div id="ls"></div>
+</div>
+<script>
+const RAW="1 TVP 1;2 TVP 2;4 TV4;5 Polsat;7 TVN;8 TV Puls;9 TVN 7;81 Polsat Sport Premium 1;82 Polsat Sport Premium 2;83 Polsat Sport Extra 1;84 Polsat Sport Extra 2;85 Polsat Sport Extra 3;86 Polsat Sport Extra 4;101 TVP HD;106 TVN Style;108 TVN Turbo;109 BBC Lifestyle;110 BBC First;111 BBC Brit;112 ID;113 Viasat True Crime;114 TLC;115 Polsat Cafe;116 Crime+Investigation Polsat;118 Super Polsat;119 Tele5;120 Fashion TV;121 E! Entertainment;122 Stargaze TV;146 CANAL+ Domo;148 CANAL+ Kuchnia;149 Food Network;150 Polsat 2;151 PULS 2;152 ESKA TV;153 Nowa TV;154 TVP Rozrywka;155 TV6;156 ZOOM;157 METRO;158 WP;159 Home TV;161 Polsat Rodzina;162 Show TV;163 Active Family;164 ULTRA TV;165 TVP Kobieta;166 News24;167 Antena;168 Novelas+;169 CTV - Dla Ciebie;252 FunBox (4K);253 WPolsce24;254 ULTRA TV (4K);319 TVP Info;320 TVP 3;322 Polsat News;323 BIZNES24 HD;333 TVN 24;334 Polsat News 2;335 TVN 24 BiS;336 TTV;338 HGTV;339 WPolsce24;340 TV Republika;341 Wydarzenia 24;342 Euronews;343 BBC News;344 Polsat News Polityka;345 Euronews Polski;346 Bloomberg;347 CNN;352 TVS;353 TVP Polonia;355 TVC;357 TVC Super;370 National Geographic;371 HISTORY;372 National Geographic Wild;373 Nat Geo People;374 H2;375 TVP Nauka;376 Discovery Channel;377 Discovery Science;378 DTX;379 Polsat Viasat Explore;380 Discovery Life;381 Animal Planet;382 BBC Earth;383 Travel Channel;384 PLANETE+;385 Adventure;386 Fokus TV;387 TVP Kultura;388 TVP Historia;390 Polsat Viasat History;391 Discovery Historia;392 Polsat Reality;393 TVP Dokument;395 Polsat Viasat Nature;396 Polsat Doku;397 DocuBox;399 STUDIOMED TV;400 Polsat X;422 Inultra;440 HBO;441 HBO 2;442 HBO 3;443 CINEMAX;444 CINEMAX 2;447 CANAL+ PREMIUM;448 CANAL+ 1;449 CANAL+ FILM;450 CANAL+ SERIALE;451 CANAL+ 360;452 CANAL+ DOKUMENT;453 CANAL+ SPORT;454 CANAL+ SPORT 2;455 CANAL+ SPORT 3;456 CANAL+ SPORT 4;458 CANAL+ NOW;465 SkyShowtime 1;466 SkyShowtime 2;468 FILMBOX+ One;469 FILMBOX+ Emotion;470 FILMBOX+ Hits;471 FILMBOX+ Comedy;472 FILMBOX+ Action;473 FILMBOX+ Festival;474 Kino Polska;475 AXN;476 Kabaret TV;477 AXN Spin;479 AXN White;480 AXN Black;481 Polsat Film;482 ale kino+;483 Paramount Network;484 Comedy Central;485 Polsat Comedy Central Extra;486 Warner TV;487 FX;488 AMC;489 FX Comedy;490 Bollywood;491 Filmmax (4K);492 TVP Seriale;493 Romance TV;494 Sundance TV;495 Novela TV;496 TVN Fabuła;497 Stopklatka;498 Polsat Seriale;499 Viasat Epic Drama;500 13 ulica;501 Sci Fi;502 Polsat Film 2;503 ViDoc TV;521 Nautical Channel HD;552 TVP Sport;553 CANAL+ SPORT 5;554 Eleven Sports 1 HD;555 Eleven Sports 2 HD;556 Eleven Sports 3 HD;557 Polsat Sport 1;558 Polsat Sport 2;559 Polsat Sport Fight;561 Polsat Sport 3;562 Polsat Play;563 Polsat Games;564 Eurosport 1;565 Eurosport 2;566 Eurosport 3;567 Eurosport 4;568 SportKlub;569 Fightklub;570 FightBox;571 Extreme Channel;572 Motowizja;573 Golf Zone;574 Gametoon;662 TVP ABC;663 Polsat JimJam;665 Cbeebies;666 MiniMini+;667 Nick Jr.;668 Nickelodeon;669 Nicktoons;670 Cartoon Network;671 Disney Channel;672 Disney XD;673 Disney Junior;674 Da Vinci;675 Cartoonito;676 teleTOON+;677 TOP KIDS;678 Junior Music;679 Junior Channel;681 TeenNick;682 TVP Alfa;770 4FUN.TV;771 4FUN KIDS;772 4FUN DANCE;773 STARS.TV;774 VOX Music TV;775 Music Box Polska;777 MTV Polska;783 Szlagier TV;784 Nuta.TV;785 ESKA TV EXTRA;786 Polsat Music;787 Disco Polo Music;788 Polo TV;789 Power TV;790 Kino Polska Muzyka;795 Mezzo;796 Mezzo Live;797 Mixtape;798 Nuta Gold;806 Bielsat;807 Current Time;808 TVP World;809 TBN Polska;811 Sky News;814 Deutsche Welle;818 France24;852 TV Trwam;854 Polonia";
+const $=s=>document.querySelector(s);
+const cu=v=>((v||'').match(/https?:\/\/[^\s\]\)\[<>"']+/)||[''])[0];
+const CH=RAW.split(';').map(x=>{const m=x.match(/^(\d+) (.*)$/);return{n:+m[1],name:m[2]}});
+const B=Object.fromEntries(CH.map(c=>[c.n,c]));
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return 1}catch(e){return 0}};
+const idb=(m,v)=>new Promise(r=>{try{const q=indexedDB.open('tv',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');
+ q.onsuccess=()=>{const db=q.result,t=db.transaction('k',m=='get'?'readonly':'readwrite'),st=t.objectStore('k'),rq=m=='get'?st.get('d'):st.put(v,'d');
+  t.oncomplete=()=>{r(m=='get'?rq.result:1);db.close()};t.onerror=t.onabort=()=>r(null)};q.onerror=()=>r(null)}catch(e){r(null)}});
+let S=ld('tv.s',{order:CH.map(c=>c.n),vis:{1:1,2:1,4:1,5:1,7:1,8:1,9:1},xid:{},src:'a',url:'',proxy:'',au:{},fz:{},ppm:5});
+S.src=S.src||'a';S.proxy=S.proxy||'';S.au=S.au||{};S.fz=S.fz||{};S.url=cu(S.url);
+let D=ld('tv.d',{t:0,p:{}});if(D.v!=2)D={t:0,p:{}};
+CH.forEach(c=>{if(!S.order.includes(c.n))S.order.push(c.n)});
+const msg=t=>{$('#st').textContent=t;$('#sm').textContent=t};
+const norm=s=>s.toLowerCase().replace(/\(4k\)/g,'').replace(/\+/g,'plus').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l').replace(/\bhd\b/g,'').replace(/[^a-z0-9]/g,'');
+const bg=s=>{const a=new Set();for(let i=0;i<s.length-1;i++)a.add(s.slice(i,i+2));return a};
+const dice=(A,B)=>{let c=0;A.forEach(x=>B.has(x)&&c++);return A.size+B.size?2*c/(A.size+B.size):0};
+const fd=t=>new Date(t).toLocaleString('pl',{weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'});
+function info(){if(!D.mx)return 'Brak danych – otwórz Ustawienia';return `Program: ${fd(D.mn)} – ${fd(D.mx)}`+(D.mx<Date.now()?' (PRZESTARZAŁY)':'')+` · wczytano ${fd(D.t)}`}
+const es=v=>(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const hm=t=>new Date(t).toLocaleTimeString('pl',{hour:'2-digit',minute:'2-digit'});
+function ptime(s){const m=s.match(/(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)\s*([+-]\d{4})?/);if(!m)return 0;
+ const o=m[7]?(m[7][0]=='-'?-1:1)*(+m[7].slice(1,3)*60+ +m[7].slice(3)):0;
+ return Date.UTC(m[1],m[2]-1,m[3],m[4],m[5],m[6])-o*60000}
+const SRC=[['epgshare01 (GitHub)','https://raw.githubusercontent.com/epgshare01/share01/master/epg_ripper_PL1.xml.gz'],['epgshare01 (serwer)','https://epgshare01.online/epgshare01/epg_ripper_PL1.xml.gz'],['epg-polska.net','https://epg-polska.net/guide.xml']];
+const X=n=>S.xid[n]||S.au[n]||'';
+const NO=n=>!(D.p[X(n)]&&D.p[X(n)].length);
+async function dec(buf){const u=new Uint8Array(buf);
+ if(u[0]==31&&u[1]==139)return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+ return new TextDecoder().decode(buf)}
+const tick=()=>new Promise(r=>setTimeout(r,0));
+const un=s=>s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1').replace(/&(#x?[0-9a-f]+|[a-z]+);/gi,(m,e)=>{try{if(e[0]=='#')return String.fromCodePoint(e[1]=='x'||e[1]=='X'?parseInt(e.slice(2),16):+e.slice(1));}catch(x){return m}return({amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"})[e.toLowerCase()]||m}).trim();
+const RT=/<title(?:\s[^>]*)?>([\s\S]*?)<\/title>/,RD=/<date(?:\s[^>]*)?>([\s\S]*?)<\/date>/,RC=/<country(?:\s[^>]*)?>([\s\S]*?)<\/country>/,RE1=/<episode-num[^>]*onscreen[^>]*>([\s\S]*?)<\/episode-num>/,RE=/<episode-num(?:\s[^>]*)?>([\s\S]*?)<\/episode-num>/,RR=/<star-rating(?:\s[^>]*)?>[\s\S]*?<value>([\s\S]*?)<\/value>/,RG=/<category(?:\s[^>]*)?>[\s\S]*?<\/category>/g;
+const g1=(re,s)=>{const m=re.exec(s);return m?un(m[1]):''};
+async function ingest(text){
+ if(text.indexOf('<programme')<0)throw Error('to nie jest plik XMLTV');
+ const now=Date.now(),lo=now-6*36e5,hi=now+8*864e5,LST=[],hp=new Set();let mn=1e18,mx=0,n=0,m;
+ const re=/<programme\b([^>]*)>/g;
+ while(m=re.exec(text)){
+  const at={};m[1].replace(/(\w+)=(?:"([^"]*)"|'([^']*)')/g,(z,k,a,b)=>{at[k]=a!=null?a:b;return ''});
+  const a=ptime(at.start||''),c=at.channel;if(!c||!a)continue;
+  const b=at.stop?ptime(at.stop):a+18e5;hp.add(c);if(a<mn)mn=a;if(b>mx)mx=b;
+  if(b>=lo&&a<=hi)LST.push([c,a,b,re.lastIndex]);
+  if(++n%15000==0){msg('Analiza pliku… '+Math.round(re.lastIndex/text.length*100)+'%');await tick()}}
+ const names={},ch={},rc=/<channel\b([^>]*)>([\s\S]*?)<\/channel>/g;
+ while(m=rc.exec(text)){const id=(/\bid="([^"]*)"/.exec(m[1])||[])[1];if(!id||!hp.has(id))continue;
+  const dn=[...m[2].matchAll(/<display-name[^>]*>([\s\S]*?)<\/display-name>/g)].map(z=>un(z[1]));
+  ch[id]=dn[0]||id;dn.concat(id.replace(/\.[a-z]{2}$/i,'')).forEach(t=>{const k=norm(t);if(k&&!names[k])names[k]=id})}
+ const keys=Object.keys(names).map(k=>[k,bg(k),k.replace(/\D/g,'')]);
+ S.au={};S.fz={};
+ CH.forEach(c=>{const k=norm(c.name);if(names[k]){S.au[c.n]=names[k];return}
+  const g=bg(k),dg=k.replace(/\D/g,'');let best=0,bk;
+  keys.forEach(([q,h,d])=>{if(d!=dg)return;const v=dice(g,h);if(v>best){best=v;bk=q}});
+  if(best>=.8){S.au[c.n]=names[bk];S.fz[c.n]=1;return}
+  if(k.length>=5){let b2=0,bi;keys.forEach(([q,h,d])=>{if(d==dg&&q.length>=5&&(q.includes(k)||k.includes(q))){const v=dice(g,h);if(v>b2){b2=v;bi=names[q]}}});
+   if(bi){S.au[c.n]=bi;S.fz[c.n]=1}}});
+ const want=new Set(CH.map(c=>X(c.n)).filter(Boolean)),p={};
+ for(let i=0;i<LST.length;i++){const [k,a,b,pos]=LST[i];if(!want.has(k))continue;
+  const e=text.indexOf('</programme>',pos),sx=text.slice(pos,e<0?pos:e);
+  const ex=[g1(RD,sx),(sx.match(RG)||[]).slice(0,2).map(z=>un(z.replace(/<[^>]*>/g,''))).filter(Boolean).join('/'),g1(RC,sx),g1(RE1,sx)||g1(RE,sx),g1(RR,sx)].filter(Boolean).join(' · ');
+  const r=[Math.round(a/6e4),Math.round((b-a)/6e4),g1(RT,sx)||'?'];if(ex)r.push(ex);(p[k]=p[k]||[]).push(r);
+  if(i%5000==4999){msg('Przetwarzanie programów… '+Math.round(i/LST.length*100)+'%');await tick()}}
+ Object.values(p).forEach(l=>l.sort((u,v)=>u[0]-v[0]));
+ D={v:2,t:now,p,ch,mn,mx};sv('tv.s',S);
+ idb('put',D).then(ok=>{if(ok)localStorage.removeItem('tv.d');else if(!sv('tv.d',D))msg('UWAGA: nie zapisano danych w pamięci przeglądarki (plik za duży). Zrób kopię zapasową.')});
+ const vis=CH.filter(c=>S.vis[c.n]),ok=vis.filter(c=>p[X(c.n)]),all=CH.filter(c=>p[X(c.n)]);
+ msg(`${info()} · z programem: ${ok.length}/${vis.length} widocznych, ${all.length}/${CH.length} wszystkich`);draw();list()}
+async function refresh(){
+ S.url=cu(S.url);const u=S.src=='c'?[S.url]:S.src=='a'?[S.url].concat(SRC.map(s=>s[1])):[SRC[+S.src][1]],er=[];
+ for(const a of u){if(!a)continue;msg('Pobieranie: '+a.split('/')[2]+'…');
+  try{const r=await fetch(S.proxy?S.proxy.replace('{url}',encodeURIComponent(a)):a);if(!r.ok)throw Error('HTTP '+r.status);
+   await ingest(await dec(await r.arrayBuffer()));return}
+  catch(e){er.push(a.split('/')[2]+': '+(/fetch|Load failed|NetworkError/i.test(e.message)?'zablokowane (CORS) lub brak sieci':e.message))}}
+ msg('Nie pobrano. '+er.join('; ')+'. Pobierz plik ręcznie i wczytaj go w Ustawieniach.')}
+let R=null,tkf=0;
+function draw(){
+ const g=$('#g'),keep=g.scrollLeft,kt=g.scrollTop,cw=g.clientWidth||1000,now=Date.now(),t0=Math.floor((now-36e5)/18e5)*18e5,t1=Math.ceil(Math.max(t0+12*36e5,Math.min(D.mx||0,t0+8*864e5))/18e5)*18e5,k=S.ppm/6e4,L=150,W=(t1-t0)*k;
+ const tA=t0+(keep-L-cw)/k,tB=t0+(keep+2*cw-L)/k;R={tA,tB,t0,t1,k,cw};
+ let h=`<div class="in" style="width:${W+L}px"><div class="row hd"><div class="lab"></div>`;
+ for(let t=t0;t<t1;t+=18e5){const d=new Date(t);h+=`<div class="tk" style="left:${L+(t-t0)*k}px">${hm(t)}${d.getHours()+d.getMinutes()==0?' '+d.toLocaleDateString('pl',{weekday:'short',day:'numeric'}):''}</div>`}
+ h+='</div>';
+ S.order.filter(n=>S.all||S.vis[n]).forEach(n=>{
+  const l=D.p[X(n)]||[];
+  h+=`<div class="row" data-n="${n}"><div class="lab${S.vis[n]?'':' off'}" draggable="true" title="${B[n].name}"><b>${n}</b>${B[n].name}</div>`;
+  let any=0;
+  l.forEach(([a0,d0,t,ex])=>{const a=a0*6e4,b=a+d0*6e4;if(b<=t0||a>=t1)return;any=1;if(b<tA||a>tB)return;const s=Math.max(a,t0),e=Math.min(b,t1);
+   h+=`<div class="p${a<=now&&now<b?' now':''}" title="${hm(a)}–${hm(b)} ${es(t)}${ex?'&#10;'+es(ex):''}" style="left:${L+(s-t0)*k}px;width:${(e-s)*k-2}px"><span class="t"><span class="n">${es(t)}</span>${ex?`<small>${es(ex)}</small>`:''}</span></div>`});
+  if(!any)h+='<div class="none">brak danych</div>';
+  h+='</div>'});
+ h+=`<div class="nd" style="left:${L+(now-t0)*k}px"></div></div>`;
+ g.innerHTML=h;g.scrollLeft=keep;g.scrollTop=kt;g.dataset.now=(now-t0)*k}
+$('#g').addEventListener('scroll',()=>{if(tkf||!R)return;tkf=1;requestAnimationFrame(()=>{tkf=0;const g=$('#g'),vs=R.t0+(g.scrollLeft-150)/R.k,ve=vs+g.clientWidth/R.k,m=R.cw/R.k/3;
+ if((vs<R.tA+m&&R.tA>R.t0)||(ve>R.tB-m&&R.tB<R.t1))draw()})});
+function toNow(){const g=$('#g');g.scrollLeft=+g.dataset.now-(g.clientWidth-150)/2}
+function shown(){const q=norm($('#q').value||''),o=$('#ov').checked;
+ return S.order.filter(n=>(!o||S.vis[n])&&(!q||norm(n+B[n].name).includes(q))&&(!$('#nx').checked||NO(n)))}
+function list(){
+ $('#dl2').innerHTML=Object.entries(D.ch||{}).map(([i,n])=>`<option value="${i}">${n.replace(/</g,'')}`).join('');
+ $('#ls').innerHTML=shown().map(n=>`<div class="li" data-n="${n}"><span class="h" draggable="true" title="przeciągnij">⠿</span><input type="checkbox" data-a="v" ${S.vis[n]?'checked':''}>
+ <label>${n} ${B[n].name}${NO(n)?' ⚠':(S.fz[n]&&!S.xid[n]?' ≈':'')}</label><input type="text" class="x" data-a="x" list="dl2" placeholder="${S.au[n]||'id XMLTV'}" value="${S.xid[n]||''}">
+ <button data-a="t">⤒</button><button data-a="u">↑</button><button data-a="d">↓</button></div>`).join('')}
+function save(){sv('tv.s',S)}
+$('#ls').addEventListener('click',e=>{const a=e.target.dataset.a,n=+e.target.closest('.li')?.dataset.n;if(!a||a=='v'||a=='x')return;
+ const o=S.order,l=shown();
+ if(a=='t'){o.splice(o.indexOf(n),1);o.unshift(n)}
+ else{const j=l[l.indexOf(n)+(a=='u'?-1:1)];if(j==null)return;const x=o.indexOf(n),y=o.indexOf(j);[o[x],o[y]]=[o[y],o[x]]}
+ save();list();draw()});
+$('#ls').addEventListener('change',e=>{const a=e.target.dataset.a,n=+e.target.closest('.li').dataset.n;
+ if(a=='v'){e.target.checked?S.vis[n]=1:delete S.vis[n]}
+ if(a=='x')S.xid[n]=e.target.value.trim();
+ save();draw()});
+$('#q').oninput=$('#ov').onchange=$('#nx').onchange=list;
+$('#all').checked=!!S.all;$('#all').onchange=e=>{S.all=e.target.checked;save();draw()};
+$('#so').onclick=()=>{S.order.sort((a,b)=>a-b);save();list();draw()};
+$('#bn').onclick=toNow;$('#br').onclick=refresh;$('#rf').onclick=()=>{S.src=$('#src').value;S.url=cu($('#url').value);$('#url').value=S.url;if(S.src=='c'&&!S.url){msg('Wpisz adres XMLTV we własnym adresie');return}S.proxy=$('#px').value.trim();save();refresh()};
+$('#bs').onclick=()=>{$('#src').innerHTML='<option value="a">Automatycznie (po kolei)</option>'+SRC.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join('')+'<option value="c">Własny adres</option>';
+ $('#src').value=S.src;$('#url').value=S.url;$('#px').value=S.proxy;
+ $('#dl').innerHTML=SRC.map(x=>`<a href="${x[1]}" target="_blank" rel="noopener">${x[0]}</a>`).join(' · ');list();$('#s').hidden=false};
+$('#sc').onclick=()=>{$('#s').hidden=true};
+$('#bm').onclick=()=>{S.ppm=Math.max(2,S.ppm-1);save();draw()};
+$('#bp').onclick=()=>{S.ppm=Math.min(12,S.ppm+1);save();draw()};
+$('#pb').onclick=()=>{const t=$('#pt').value;if(!t.trim()){msg('Pole jest puste');return}msg('Przetwarzanie…');setTimeout(async()=>{try{await ingest(t);$('#pt').value=''}catch(x){msg('Błąd: '+x.message)}},30)};
+$('#fx').onchange=async e=>{const f=e.target.files[0];if(!f)return;msg('Czytanie pliku…');
+ try{await ingest(await dec(await f.arrayBuffer()))}catch(x){msg('Błąd pliku: '+x.message)}};
+$('#fj').onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ try{const o=JSON.parse(await f.text());S=o.S;D=o.D;if(D.v!=2)D={t:0,p:{}};S.au=S.au||{};S.fz=S.fz||{};save();idb('put',D);list();draw();msg('Wczytano kopię')}catch(x){msg('Zły plik kopii')}};
+$('#ex').onclick=()=>{const a=document.createElement('a');
+ a.href=URL.createObjectURL(new Blob([JSON.stringify({S,D})],{type:'application/json'}));a.download='program-tv-kopia.json';a.click()};
+$('#rs').onclick=()=>{if(confirm('Usunąć ustawienia i dane?')){localStorage.removeItem('tv.s');localStorage.removeItem('tv.d');try{indexedDB.deleteDatabase('tv')}catch(e){}setTimeout(()=>location.reload(),300)}};
+let dn=null;const clr=()=>document.querySelectorAll('.ov').forEach(x=>x.classList.remove('ov'));
+[$('#ls'),$('#g')].forEach(el=>{
+ el.addEventListener('dragstart',e=>{const t=e.target,r=t.closest&&t.closest('[data-n]');if(!t.draggable||!r)return;dn=+r.dataset.n;
+  e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',''+dn);e.dataTransfer.setDragImage(t.classList.contains('lab')?t:r,10,10)});
+ el.addEventListener('dragover',e=>{const r=e.target.closest('[data-n]');if(dn==null||!r)return;e.preventDefault();clr();r.classList.add('ov')});
+ el.addEventListener('drop',e=>{const r=e.target.closest('[data-n]');if(dn==null||!r)return;e.preventDefault();
+  const t=+r.dataset.n,o=S.order,i=o.indexOf(dn),j=o.indexOf(t);
+  if(dn!=t){o.splice(i,1);o.splice(o.indexOf(t)+(i<j?1:0),0,dn);save();list();draw()}dn=null;clr()});
+ el.addEventListener('dragend',()=>{dn=null;clr()})});
+draw();toNow();
+msg(info());
+idb('get').then(d=>{if(d&&d.v==2&&d.t>=(D.t||0)){D=d;draw();list();msg(info())}});
+if(navigator.onLine&&Date.now()-D.t>6*36e5)refresh();
+setInterval(()=>{if(!document.hidden)draw()},18e4);
+</script></body></html>
