@@ -41,7 +41,7 @@ a{color:#8cf}
 .bx{background:#0a223c;border-radius:8px;padding:4px 12px 8px;margin-bottom:14px}
 .bx h3{margin-top:8px}
 .ver{text-align:center;margin:4px 0 12px;color:#c3cfdc}
-#rf,#rs{margin-top:10px}
+#rs{margin-top:10px}
 #sc{width:100%}
 .hd .lab{line-height:28px;font-size:13px;color:#9fb4cc}
 .ur{display:flex;gap:8px}.ur input{flex:1;min-width:0}.ur button{padding:6px 12px}
@@ -54,12 +54,11 @@ a{color:#8cf}
 </header>
 <div id="g"></div>
 <div id="s" hidden>
-<p class="ver">Program TV v1.5 © 2026 romry</p>
+<p class="ver">Program TV v1.7 © 2026 romry</p>
 <div class="bx">
 <h3>Źródło danych</h3>
 <p style="margin-bottom:4px">Adres pliku XMLTV:</p>
-<div class="ur"><input type="text" id="url"><button id="go" title="Otwórz adres w nowej karcie" aria-label="Otwórz adres w nowej karcie"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></button></div>
-<p><button id="rf">Pobierz teraz</button> <label><input type="checkbox" id="au"> pobieraj automatycznie przy otwarciu (tylko jeśli serwer na to pozwala)</label></p>
+<div class="ur"><input type="text" id="url"><button id="rf">Pobierz</button><button id="go" title="Otwórz adres w nowej karcie" aria-label="Otwórz adres w nowej karcie"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></button></div>
 <p>Albo plik zapisany na dysku (.xml lub .xml.gz): <input type="file" id="fx" accept=".xml,.gz"></p>
 <p id="sm" style="color:#bf4;min-height:1.4em"></p>
 <datalist id="dl2"></datalist>
@@ -80,6 +79,7 @@ a{color:#8cf}
 <script>
 const RAW="1 TVP 1;2 TVP 2;4 TV4;5 Polsat;7 TVN;8 TV Puls;9 TVN 7;81 Polsat Sport Premium 1;82 Polsat Sport Premium 2;83 Polsat Sport Extra 1;84 Polsat Sport Extra 2;85 Polsat Sport Extra 3;86 Polsat Sport Extra 4;101 TVP HD;106 TVN Style;108 TVN Turbo;109 BBC Lifestyle;110 BBC First;111 BBC Brit;112 ID;113 Viasat True Crime;114 TLC;115 Polsat Cafe;116 Crime+Investigation Polsat;118 Super Polsat;119 Tele5;120 Fashion TV;121 E! Entertainment;122 Stargaze TV;146 CANAL+ Domo;148 CANAL+ Kuchnia;149 Food Network;150 Polsat 2;151 PULS 2;152 ESKA TV;153 Nowa TV;154 TVP Rozrywka;155 TV6;156 ZOOM;157 METRO;158 WP;159 Home TV;161 Polsat Rodzina;162 Show TV;163 Active Family;164 ULTRA TV;165 TVP Kobieta;166 News24;167 Antena;168 Novelas+;169 CTV - Dla Ciebie;252 FunBox (4K);253 WPolsce24;254 ULTRA TV (4K);319 TVP Info;320 TVP 3;322 Polsat News;323 BIZNES24 HD;333 TVN 24;334 Polsat News 2;335 TVN 24 BiS;336 TTV;338 HGTV;339 WPolsce24;340 TV Republika;341 Wydarzenia 24;342 Euronews;343 BBC News;344 Polsat News Polityka;345 Euronews Polski;346 Bloomberg;347 CNN;352 TVS;353 TVP Polonia;355 TVC;357 TVC Super;370 National Geographic;371 HISTORY;372 National Geographic Wild;373 Nat Geo People;374 H2;375 TVP Nauka;376 Discovery Channel;377 Discovery Science;378 DTX;379 Polsat Viasat Explore;380 Discovery Life;381 Animal Planet;382 BBC Earth;383 Travel Channel;384 PLANETE+;385 Adventure;386 Fokus TV;387 TVP Kultura;388 TVP Historia;390 Polsat Viasat History;391 Discovery Historia;392 Polsat Reality;393 TVP Dokument;395 Polsat Viasat Nature;396 Polsat Doku;397 DocuBox;399 STUDIOMED TV;400 Polsat X;422 Inultra;440 HBO;441 HBO 2;442 HBO 3;443 CINEMAX;444 CINEMAX 2;447 CANAL+ PREMIUM;448 CANAL+ 1;449 CANAL+ FILM;450 CANAL+ SERIALE;451 CANAL+ 360;452 CANAL+ DOKUMENT;453 CANAL+ SPORT;454 CANAL+ SPORT 2;455 CANAL+ SPORT 3;456 CANAL+ SPORT 4;458 CANAL+ NOW;465 SkyShowtime 1;466 SkyShowtime 2;468 FILMBOX+ One;469 FILMBOX+ Emotion;470 FILMBOX+ Hits;471 FILMBOX+ Comedy;472 FILMBOX+ Action;473 FILMBOX+ Festival;474 Kino Polska;475 AXN;476 Kabaret TV;477 AXN Spin;479 AXN White;480 AXN Black;481 Polsat Film;482 ale kino+;483 Paramount Network;484 Comedy Central;485 Polsat Comedy Central Extra;486 Warner TV;487 FX;488 AMC;489 FX Comedy;490 Bollywood;491 Filmmax (4K);492 TVP Seriale;493 Romance TV;494 Sundance TV;495 Novela TV;496 TVN Fabuła;497 Stopklatka;498 Polsat Seriale;499 Viasat Epic Drama;500 13 ulica;501 Sci Fi;502 Polsat Film 2;503 ViDoc TV;521 Nautical Channel HD;552 TVP Sport;553 CANAL+ SPORT 5;554 Eleven Sports 1 HD;555 Eleven Sports 2 HD;556 Eleven Sports 3 HD;557 Polsat Sport 1;558 Polsat Sport 2;559 Polsat Sport Fight;561 Polsat Sport 3;562 Polsat Play;563 Polsat Games;564 Eurosport 1;565 Eurosport 2;566 Eurosport 3;567 Eurosport 4;568 SportKlub;569 Fightklub;570 FightBox;571 Extreme Channel;572 Motowizja;573 Golf Zone;574 Gametoon;662 TVP ABC;663 Polsat JimJam;665 Cbeebies;666 MiniMini+;667 Nick Jr.;668 Nickelodeon;669 Nicktoons;670 Cartoon Network;671 Disney Channel;672 Disney XD;673 Disney Junior;674 Da Vinci;675 Cartoonito;676 teleTOON+;677 TOP KIDS;678 Junior Music;679 Junior Channel;681 TeenNick;682 TVP Alfa;770 4FUN.TV;771 4FUN KIDS;772 4FUN DANCE;773 STARS.TV;774 VOX Music TV;775 Music Box Polska;777 MTV Polska;783 Szlagier TV;784 Nuta.TV;785 ESKA TV EXTRA;786 Polsat Music;787 Disco Polo Music;788 Polo TV;789 Power TV;790 Kino Polska Muzyka;795 Mezzo;796 Mezzo Live;797 Mixtape;798 Nuta Gold;806 Bielsat;807 Current Time;808 TVP World;809 TBN Polska;811 Sky News;814 Deutsche Welle;818 France24;852 TV Trwam;854 Polonia";
 const $=s=>document.querySelector(s);
+const DEF='https://epg.ovh/pl/plar.gz';
 const cu=v=>((v||'').match(/https?:\/\/[^\s\]\)\[<>"']+/)||[''])[0];
 const CH=RAW.split(';').map(x=>{const m=x.match(/^(\d+) (.*)$/);return{n:+m[1],name:m[2]}});
 const B=Object.fromEntries(CH.map(c=>[c.n,c]));
@@ -89,10 +89,10 @@ const idb=(m,v)=>new Promise(r=>{try{const q=indexedDB.open('tv',1);q.onupgraden
  q.onsuccess=()=>{const db=q.result,t=db.transaction('k',m=='get'?'readonly':'readwrite'),st=t.objectStore('k'),rq=m=='get'?st.get('d'):st.put(v,'d');
   t.oncomplete=()=>{r(m=='get'?rq.result:1);db.close()};t.onerror=t.onabort=()=>r(null)};q.onerror=()=>r(null)}catch(e){r(null)}});
 let S=ld('tv.s',{order:CH.map(c=>c.n),vis:{1:1,2:1,4:1,5:1,7:1,8:1,9:1},xid:{},src:'a',url:'',proxy:'',au:{},fz:{},ppm:5});
-S.src=S.src||'a';S.proxy=S.proxy||'';S.au=S.au||{};S.fz=S.fz||{};S.url=cu(S.url);
+S.src=S.src||'a';S.proxy=S.proxy||'';S.au=S.au||{};S.fz=S.fz||{};S.nc=S.nc||{};S.url=cu(S.url);if(!S.url||S.url=='https://epg.ovh/pl.xml')S.url=DEF;
 let D=ld('tv.d',{t:0,p:{}});if(D.v!=2)D={t:0,p:{}};
 CH.forEach(c=>{if(!S.order.includes(c.n))S.order.push(c.n)});
-const msg=t=>{$('#st').textContent=t;$('#sm').textContent=t};
+const msg=t=>{const m=info()+(t?' · '+t:'');$('#st').textContent=m;$('#sm').textContent=m};
 const norm=s=>s.toLowerCase().replace(/\(4k\)/g,'').replace(/\+/g,'plus').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l').replace(/\bhd\b/g,'').replace(/[^a-z0-9]/g,'');
 const bg=s=>{const a=new Set();for(let i=0;i<s.length-1;i++)a.add(s.slice(i,i+2));return a};
 const dice=(A,B)=>{let c=0;A.forEach(x=>B.has(x)&&c++);return A.size+B.size?2*c/(A.size+B.size):0};
@@ -144,13 +144,18 @@ async function ingest(text){
  D={v:2,t:now,p,ch,mn,mx};sv('tv.s',S);
  idb('put',D).then(ok=>{if(ok)localStorage.removeItem('tv.d');else if(!sv('tv.d',D))msg('UWAGA: nie zapisano danych w pamięci przeglądarki (plik za duży). Zrób kopię zapasową.')});
  const vis=CH.filter(c=>S.vis[c.n]),ok=vis.filter(c=>p[X(c.n)]),all=CH.filter(c=>p[X(c.n)]);
- msg(`${info()} · z programem: ${ok.length}/${vis.length} widocznych, ${all.length}/${CH.length} wszystkich`);draw();list()}
+ msg(`z programem: ${ok.length}/${vis.length} widocznych, ${all.length}/${CH.length} wszystkich`);draw();list()}
+function opn(u){const w=window.open(u,'_blank');if(w){try{w.opener=null}catch(e){}}return !!w}
 async function refresh(q){
- S.url=cu(S.url);if(!S.url){if(q!==1)msg('Wpisz adres XMLTV albo wybierz plik z dysku');return}
+ S.url=cu(S.url)||DEF;
  msg('Pobieranie: '+S.url.split('/')[2]+'…');
  try{const r=await fetch(S.url);if(!r.ok)throw Error('HTTP '+r.status);await ingest(await dec(await r.arrayBuffer()))}
- catch(e){if(q===1){msg(info());return}
-  msg('Nie pobrano ('+(/fetch|Load failed|NetworkError/i.test(e.message)?'serwer nie zezwala przeglądarce na pobranie (CORS) lub brak sieci':e.message)+'). Zapisz plik na dysk i wybierz go poniżej.')}}
+ catch(e){if(q===1){msg();return}
+  if(/fetch|Load failed|NetworkError/i.test(e.message)){
+   if(navigator.onLine===false){msg('Brak połączenia z internetem');return}
+   S.nc=S.nc||{};S.nc[S.url]=1;save();
+   msg(opn(S.url)?'Serwer nie pozwala pobrać pliku w aplikacji, więc otwieram adres w przeglądarce. Zapisz plik i wybierz go poniżej.':'Serwer nie pozwala pobrać pliku w aplikacji, a przeglądarka zablokowała otwarcie. Kliknij „Pobierz” jeszcze raz.')}
+  else msg('Nie pobrano ('+e.message+'). Zapisz plik na dysk i wybierz go poniżej.')}}
 let R=null,tkf=0;
 function draw(){
  const g=$('#g'),keep=g.scrollLeft,kt=g.scrollTop,cw=g.clientWidth||1000,now=Date.now(),t0=Math.floor((now-36e5)/18e5)*18e5,t1=Math.ceil(Math.max(t0+12*36e5,Math.min(D.mx||0,t0+8*864e5))/18e5)*18e5,k=S.ppm/6e4,L=150,W=(t1-t0)*k;
@@ -193,9 +198,11 @@ $('#q').oninput=$('#ov').onchange=$('#nx').onchange=list;
 $('#all').checked=!!S.all;$('#all').onchange=e=>{S.all=e.target.checked;save();draw()};
 $('#so').onclick=()=>{S.order.sort((a,b)=>a-b);save();list();draw()};
 $('#bn').onclick=toNow;$('#br').onclick=()=>refresh();
-$('#go').onclick=()=>{const u=cu($('#url').value);if(!u){msg('Wpisz adres XMLTV');return}window.open(u,'_blank','noopener')};
-$('#rf').onclick=()=>{S.url=cu($('#url').value);$('#url').value=S.url;S.auto=$('#au').checked;save();refresh()};
-$('#bs').onclick=()=>{$('#url').value=S.url;$('#au').checked=!!S.auto;list();$('#s').hidden=false};
+$('#go').onclick=()=>{const u=cu($('#url').value)||DEF;window.open(u,'_blank','noopener')};
+$('#rf').onclick=()=>{S.url=cu($('#url').value)||DEF;$('#url').value=S.url;save();
+ if(S.nc&&S.nc[S.url]){msg(opn(S.url)?'Otwieram adres w przeglądarce. Zapisz plik i wybierz go poniżej.':'Przeglądarka zablokowała otwarcie adresu');return}
+ refresh()};
+$('#bs').onclick=()=>{$('#url').value=S.url;list();$('#s').hidden=false};
 $('#sc').onclick=()=>{$('#s').hidden=true};
 $('#bm').onclick=()=>{S.ppm=Math.max(2,S.ppm-1);save();draw()};
 $('#bp').onclick=()=>{S.ppm=Math.min(12,S.ppm+1);save();draw()};
@@ -216,10 +223,9 @@ let dn=null;const clr=()=>document.querySelectorAll('.ov').forEach(x=>x.classLis
   if(dn!=t){o.splice(i,1);o.splice(o.indexOf(t)+(i<j?1:0),0,dn);save();list();draw()}dn=null;clr()});
  el.addEventListener('dragend',()=>{dn=null;clr()})});
 draw();toNow();
-msg(info());
-idb('get').then(d=>{if(d&&d.v==2&&d.t>=(D.t||0)){D=d;draw();list();msg(info())}});
-if(S.auto&&S.url&&navigator.onLine&&Date.now()-D.t>6*36e5)refresh(1);
+msg();
+idb('get').then(d=>{if(d&&d.v==2&&d.t>=(D.t||0)){D=d;draw();list();msg()}});
 setInterval(()=>{if(!document.hidden)draw()},18e4);
-let wk=0;const wake=()=>{if(document.hidden||wk)return;wk=1;setTimeout(()=>{wk=0;draw();toNow();msg(info())},150)};
+let wk=0;const wake=()=>{if(document.hidden||wk)return;wk=1;setTimeout(()=>{wk=0;draw();toNow();msg()},150)};
 document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake);
 </script></body></html>
