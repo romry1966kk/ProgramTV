@@ -54,7 +54,7 @@ a{color:#8cf}
 </header>
 <div id="g"></div>
 <div id="s" hidden>
-<p class="ver">Program TV v1.4 © 2026 romry</p>
+<p class="ver">Program TV v1.5 © 2026 romry</p>
 <div class="bx">
 <h3>Źródło danych</h3>
 <p style="margin-bottom:4px">Adres pliku XMLTV:</p>
@@ -220,4 +220,6 @@ msg(info());
 idb('get').then(d=>{if(d&&d.v==2&&d.t>=(D.t||0)){D=d;draw();list();msg(info())}});
 if(S.auto&&S.url&&navigator.onLine&&Date.now()-D.t>6*36e5)refresh(1);
 setInterval(()=>{if(!document.hidden)draw()},18e4);
+let wk=0;const wake=()=>{if(document.hidden||wk)return;wk=1;setTimeout(()=>{wk=0;draw();toNow();msg(info())},150)};
+document.addEventListener('visibilitychange',wake);window.addEventListener('pageshow',wake);window.addEventListener('focus',wake);
 </script></body></html>
